@@ -3,6 +3,7 @@ package org.zedaav.hw2mqtt.mqtt;
 import java.io.IOException;
 import java.util.Properties;
 
+import org.eclipse.paho.client.mqttv3.IMqttMessageListener;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
@@ -18,26 +19,26 @@ public class MqttConnector implements Hw2MqttService {
 
 	private static MqttConnector instance;
 	private SimpleLogger logger = SimpleLogger.getInstance();
-	
+
 	private String broker;
 	private String clientID;
 	private String topicRoot;
 	private MqttClient client;
-	
+
 	public static MqttConnector getInstance() {
 		if (instance == null) {
 			instance = new MqttConnector();
 		}
 		return instance;
 	}
-	
+
 	public void init(Properties props) throws IOException {
 		// Check properties
 		broker = PropertiesReader.getProperty(MQTT_BROKER, props);
 		clientID = PropertiesReader.getProperty(MQTT_CLIENTID, props);
 		topicRoot = PropertiesReader.getProperty(MQTT_TOPICROOT, props);
 	}
-	
+
 	public void start() throws IOException {
 		try {
 			// Connect to broker
@@ -47,13 +48,21 @@ public class MqttConnector implements Hw2MqttService {
 			throw new IOException(e);
 		}
 	}
-	
+
 	public void publish(String topic, String payloadString) {
 		MqttMessage mm = new MqttMessage(payloadString.getBytes());
 		try {
-			String fullTopic = topicRoot + (topicRoot.endsWith("/")?"":"/") + topic;
-			client.publish(fullTopic , mm);
+			String fullTopic = topicRoot + (topicRoot.endsWith("/") ? "" : "/") + topic;
+			client.publish(fullTopic, mm);
 			logger.log(LoggerLevel.INFO, "Sent MQTT message; topic: %s / payload: %s", fullTopic, payloadString);
+		} catch (MqttException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void subscribe(String topic, IMqttMessageListener listener) {
+		try {
+			client.subscribe(topic, listener);
 		} catch (MqttException e) {
 			e.printStackTrace();
 		}
