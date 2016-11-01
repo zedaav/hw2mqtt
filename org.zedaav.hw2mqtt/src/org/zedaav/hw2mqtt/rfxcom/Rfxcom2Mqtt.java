@@ -12,6 +12,7 @@ import java.util.Properties;
 import org.zedaav.hw2mqtt.Hw2MqttService;
 import org.zedaav.hw2mqtt.log.LoggerLevel;
 import org.zedaav.hw2mqtt.log.SimpleLogger;
+import org.zedaav.hw2mqtt.misc.Hw2MqttConstants;
 import org.zedaav.hw2mqtt.misc.PropertiesReader;
 import org.zedaav.hw2mqtt.mqtt.MqttConnector;
 
@@ -157,7 +158,7 @@ public class Rfxcom2Mqtt implements Hw2MqttService {
 		if (on_off) {
 			deviceID = deviceID - 16;
 		}
-		String onOffPayload = on_off?"ON":"OFF";
+		String onOffPayload = on_off?Hw2MqttConstants.ON:Hw2MqttConstants.OFF;
 		String deviceIDStr = String.format("%X", deviceID);
 		logger.log(LoggerLevel.INFO, "CHACON event: %s %s", deviceIDStr, onOffPayload);
 		

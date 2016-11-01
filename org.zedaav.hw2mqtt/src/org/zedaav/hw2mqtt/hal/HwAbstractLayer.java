@@ -9,6 +9,7 @@ import java.util.Set;
 import org.eclipse.paho.client.mqttv3.IMqttMessageListener;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.zedaav.hw2mqtt.Hw2MqttService;
+import org.zedaav.hw2mqtt.hal.tranform.HalPayloadTransform;
 import org.zedaav.hw2mqtt.log.LoggerLevel;
 import org.zedaav.hw2mqtt.log.SimpleLogger;
 import org.zedaav.hw2mqtt.misc.PropertiesReader;
@@ -46,7 +47,14 @@ public class HwAbstractLayer implements Hw2MqttService {
 			for (String deviceID : deviceIDs) {
 				// Get HW topic
 				String hwTopic = PropertiesReader.getProperty("hal." + placeID + "." + deviceID + ".hwTopic", props);
-				hwBindings.put(mainHwTopic + "/" + hwTopic, new HwBinding(placeID, deviceID, hwTopic));
+				HwBinding hb = new HwBinding(placeID, deviceID, hwTopic);
+				hwBindings.put(mainHwTopic + "/" + hwTopic, hb);
+				
+				// Specific transform?
+				String payloadTransform = PropertiesReader.getProperty("hal." + placeID + "." + deviceID + ".payloadTransform", props, null);
+				if (payloadTransform != null) {
+					hb.initPayloadTransform(payloadTransform);
+				}
 			}
 		}
 	}
@@ -67,6 +75,12 @@ public class HwAbstractLayer implements Hw2MqttService {
 				
 				// New HW event
 				logger.log(LoggerLevel.INFO, "Received HW event: %s -- %s", topic, payload);
+				
+				// Tranform payload?
+				HalPayloadTransform transform = hb.getTranform();
+				if (transform != null) {
+					payload = transform.transform(payload);
+				}
 				
 				// Forward as abstracted event
 				MqttConnector.getInstance().publish("places/" + hb.getPlace() + "/devices/" + hb.getDevice(), payload);
