@@ -15,6 +15,7 @@ import org.zedaav.hw2mqtt.log.SimpleLogger;
 import org.zedaav.hw2mqtt.misc.PropertiesReader;
 import org.zedaav.hw2mqtt.mqtt.MqttConnector;
 import org.zedaav.hw2mqtt.rfxcom.Rfxcom2Mqtt;
+import org.zedaav.hw2mqtt.zibase.ZibaseMqtt;
 
 public class Hw2MqttApp {
 
@@ -27,6 +28,7 @@ public class Hw2MqttApp {
 		optionalServices = new HashMap<String, Hw2MqttService>();
 		optionalServices.put("rfxcom", Rfxcom2Mqtt.getInstance());
 		optionalServices.put("hal", HwAbstractLayer.getInstance());
+		optionalServices.put("zibase", ZibaseMqtt.getInstance());
 	}
 	
 	public static void main(String[] args) {

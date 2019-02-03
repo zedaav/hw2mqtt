@@ -3,13 +3,14 @@ package org.zedaav.hw2mqtt.hal;
 import java.io.IOException;
 
 import org.zedaav.hw2mqtt.hal.tranform.HalPayloadTransform;
+import org.zedaav.hw2mqtt.hal.tranform.HalPayloadTransformOkLowToInt;
 import org.zedaav.hw2mqtt.hal.tranform.HalPayloadTransformOnOff2OpenClosed;
 
 public class HwBinding {
 	private String place;
 	private String device;
 	private String hwTopic;
-	private HalPayloadTransform tranform;
+	private HalPayloadTransform transform;
 	
 	public HwBinding(String place, String device, String hwTopic) {
 		this.place = place;
@@ -20,7 +21,9 @@ public class HwBinding {
 	public void initPayloadTransform(String payloadTransform) throws IOException {
 		// Look for known transformations
 		if (payloadTransform.equals("onoff2openclosed")) {
-			tranform = new HalPayloadTransformOnOff2OpenClosed();
+			transform = new HalPayloadTransformOnOff2OpenClosed();
+		} else if (payloadTransform.equals("oklow2int")) {
+			transform = new HalPayloadTransformOkLowToInt();
 		} else {
 			throw new IOException("Unknown payload tranformation: " + payloadTransform);
 		}
@@ -39,6 +42,6 @@ public class HwBinding {
 	}
 
 	public HalPayloadTransform getTranform() {
-		return tranform;
+		return transform;
 	}
 }
